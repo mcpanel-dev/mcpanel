@@ -1,0 +1,26 @@
+# MCPanel channel: dev, testing, stable
+MCPANEL_VERSION_CHANNEL="stable"
+
+# The gateway for eno1, used for IP detection
+IFCONFIG_GATEWAY=eno1
+
+# IP address type; inet = ipv4, inet6 = ipv6
+IFCONFIG_INETADDR=inet
+
+# Server API, e.g.: spigot, craftbukkit
+SERVER_API=spigot
+
+# Server version
+SERVER_VERSION=1.11.2
+
+# Server memory, power of 1024, in M
+SERVER_MEMORY=1024
+
+# Server visibility levels: public, lan, local
+SERVER_DEFAULT_VISIBILITY=local
+
+# Automatically agree with EULA? (https://account.mojang.com/documents/minecraft_eula)
+SERVER_AUTO_EULA=true
+
+# Link from where the script downloads the latest BuildTools
+BUILD_SERVER="https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar"

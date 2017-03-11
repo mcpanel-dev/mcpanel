@@ -1,0 +1,107 @@
+#!/bin/bash
+
+declare -r MCPANEL_DIRECTORY=$(dirname $PWD)
+declare -r SYSTEM_DATETIME=$(date +'%d%m%Y_%H%M%S')
+
+if [[ ! -e ${MCPANEL_DIRECTORY}/core/mcpanel/mcpanel.sh ]]; then
+  echo -e "\x1B[31mThe \x1B[33m'mcpanel'\x1B[31m bootstrap library is missing!\x1B[0m"
+  exit 1
+fi
+
+if [[ ! -e ${MCPANEL_DIRECTORY}/core/mcpanel/mcpanel.cnf ]]; then
+  echo -e "\x1B[31mThe \x1B[33m'mcpanel'\x1B[31m configuration is missing!\x1B[0m"
+  exit 1
+fi
+
+if [[ ! -e "${MCPANEL_DIRECTORY}/core/abs/abs.sh" ]]; then
+  echo -e "\x1B[31mThe 'Awesome Bash Stylizer' library is missing!\x1B[0m"
+  exit 1
+fi
+
+if [[ ! -e "${MCPANEL_DIRECTORY}/core/abs/abs.cnf" ]]; then
+  echo -e "\x1B[31mThe 'Awesome Bash Stylizer' configuration is missing!\x1B[0m"
+  exit 1
+fi
+
+source "${MCPANEL_DIRECTORY}/core/mcpanel/mcpanel.cnf"
+source "${MCPANEL_DIRECTORY}/core/mcpanel/mcpanel.sh"
+
+declare -r MCPANEL_VERSION_MAJOR=2
+declare -r MCPANEL_VERSION_MINOR=0
+declare -r MCPANEL_VERSION_PATCH=0
+declare -r MCPANEL_VERSION="${MCPANEL_VERSION_MAJOR}.${MCPANEL_VERSION_MINOR}.${MCPANEL_VERSION_PATCH}-${MCPANEL_VERSION_CHANNEL}"
+declare -r MCPANEL_MODULES=$(/bin/ls ${MCPANEL_DIRECTORY}/modules/enabled)
+
+declare -r SERVER_BINARY="${SERVER_API}-${SERVER_VERSION}.jar"
+
+source "${MCPANEL_DIRECTORY}/core/abs/abs.cnf"
+source "${MCPANEL_DIRECTORY}/core/abs/abs.sh"
+
+function ::main()
+{
+  local module=$1
+  local command=$2
+
+  mcpanel::banner
+
+  if [[ "${module}" == "enable-module" ]]; then
+    if [[ -z ${command} ]]; then
+      abs::error "You must provide a module to enable!"
+      return 1
+    fi
+
+    if [[ ! -e ${MCPANEL_DIRECTORY}/modules/available/mcp-${command}.sh ]]; then
+      abs::error "Module not found: ${STYLE_COMMENT}${command}"
+      return 1
+    fi
+
+    abs::notice "Enabling module: ${STYLE_COMMENT}${command}"
+    ln -s ${MCPANEL_DIRECTORY}/modules/available/mcp-${command}.sh ${MCPANEL_DIRECTORY}/modules/enabled/mcp-${command}.sh
+    if [[ $? -ne 0 ]]; then
+      abs::error "Unable to enable module"
+      return $?
+    fi
+
+    abs::success "Module activated successfully!"
+    return 0
+  fi
+
+  if [[ "${module}" == "disable-module" ]]; then
+    if [[ -z ${command} ]]; then
+      abs::error "You must provide a module to disable!"
+      return 1
+    fi
+
+    abs::notice "Disabling module: ${STYLE_COMMENT}${command}"
+    rm ${MCPANEL_DIRECTORY}/modules/enabled/mcp-${command}.sh
+    if [[ $? -ne 0 ]]; then
+      abs::error "Unable to disable module"
+      return $?
+    fi
+
+    abs::success "Module deactivated successfully!"
+    return 0
+  fi
+
+  if [[ -z "${module}" ]]; then
+    mcpanel::info
+    return $?
+  fi
+
+  if [[ ! -e "${MCPANEL_DIRECTORY}/modules/enabled/mcp-${module}.sh" ]] && [[ ! -e "${MCPANEL_DIRECTORY}/modules/available/mcp-${module}.sh" ]]; then
+    abs::error "mcpanel: error: module not found: ${STYLE_COMMENT}${module}"
+    return 1
+  fi
+
+  if [[ ! -e ${MCPANEL_DIRECTORY}/modules/enabled/mcp-${module}.sh ]] && [[ -e "${MCPANEL_DIRECTORY}/modules/available/mcp-${module}.sh" ]]; then
+    abs::comment "mcpanel: warning: module is available, but not enabled: ${STYLE_COMMENT}${module}"
+    return 1
+  fi
+
+  source "${MCPANEL_DIRECTORY}/modules/enabled/mcp-${module}.sh"
+  mcpanel::${module}::main $command
+  return $?
+}
+
+::main $@
+exit $?
