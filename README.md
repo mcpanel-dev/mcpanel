@@ -3,6 +3,9 @@ MCPanel
 
 This utility was written in order to manage a Minecraft server in my computer.
 
+MCPanel version: 2.0.0
+MCPanel channel: stable
+
 ## Features
 - free and open source software;
 - completely modular;
@@ -112,6 +115,9 @@ Also, there's a command called `explore`, which works perfectly on (almost) any 
 #### How it works?
 Modules are automatically `source`d from `modules/enabled` when you execute the `module`'s name.
 After that, the `main` function under `mcpanel::${module}` namespace is loaded, and `${command}` argument is passed automatically.
+
+#### Why version 2.0?
+It's because the first version was made in haste and used for a very long time. I decided to rewrite that one, which was versioned 1.x. I'll upload that code very soon, on a different branch!
 
 #### License
 MCPanel is licensed under MIT license.
