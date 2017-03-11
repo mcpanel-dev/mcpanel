@@ -3,7 +3,10 @@ MCPanel
 
 This utility was written in order to manage a Minecraft server in my computer.
 
+
+
 MCPanel version: 2.0.0
+
 MCPanel channel: stable
 
 ## Features
@@ -79,10 +82,12 @@ function mcpanel::MODULE_NAME::main
 
 After that, you must execute a command to enable the module, which is `mcpanel enable-module [MODULE_NAME]`
 and a symlink will be created into `modules/enabled` directory. You don't have anything else to do!
-![mcpanel enable-module](_docs/mcpanel_module-enable_simple.png)
+
+![mcpanel enable module](_docs/mcpanel_module-enable_simple.png)
 
 If the script you wrote fails, you can disable the module using `mcpanel disable-module [MODULE_NAME]`
-![mcpanel disable-module](_docs/mcpanel_module-disable_simple.png)
+
+![mcpanel disable module](_docs/mcpanel_module-disable_simple.png)
 
 #### Nice output
 I wrote Awesome Bash Stylizer (short: ABS) in order to help me have a nice output. You can demo it:
