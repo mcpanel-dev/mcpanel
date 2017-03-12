@@ -1,6 +1,6 @@
 #!/bin/bash
 
-declare -r MCPANEL_DIRECTORY=$(dirname $PWD)
+declare -r MCPANEL_DIRECTORY=$(dirname $(dirname $0))
 declare -r SYSTEM_DATETIME=$(date +'%d%m%Y_%H%M%S')
 
 if [[ ! -e ${MCPANEL_DIRECTORY}/core/mcpanel/mcpanel.sh ]]; then
