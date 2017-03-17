@@ -24,3 +24,6 @@ SERVER_AUTO_EULA=true
 
 # Link from where the script downloads the latest BuildTools
 BUILD_SERVER="https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar"
+
+# Type the name of your Minecraft launcher name, e.g.: launcher.jar
+MINECRAFT_LAUNCHER="launcher.jar"
