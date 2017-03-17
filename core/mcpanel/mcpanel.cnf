@@ -1,6 +1,3 @@
-# MCPanel channel: dev, testing, stable
-MCPANEL_VERSION_CHANNEL="stable"
-
 # The gateway for eno1, used for IP detection
 IFCONFIG_GATEWAY=eno1
 

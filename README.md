@@ -5,7 +5,7 @@ This utility was written in order to manage a Minecraft server in my computer.
 
 
 
-MCPanel version: 2.0.0
+MCPanel version: 2.1.0
 
 MCPanel channel: stable
 
