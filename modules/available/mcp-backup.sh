@@ -22,16 +22,20 @@ function mcpanel::backup::_compress
   local subdirectory=$backup_for
 
   case $backup_for in
-    complete) ;;
+    complete)
+      subdirectory=
+      ;;
     plugins) ;;
-    world) ;;
+    world)
+      subdirectory=$(cat ${MCPANEL_DIRECTORY}/process/server/server.properties | grep 'level-name=' | cut -d'=' -f2)
+      ;;
     *)
       abs::error "Invalid directory to compress: ${STYLE_COMMENT}${backup_for}"
       return 1
       ;;
   esac
 
-  abs::notice "Creating backup for ${backup_for}"
+  abs::notice "Creating backup for ${STYLE_COMMENT}${backup_for}"
 
   if [[ ! -d ${MCPANEL_DIRECTORY}/backup/${backup_for} ]]; then
     abs::writeln "Creating directory for backups"
@@ -42,11 +46,7 @@ function mcpanel::backup::_compress
     fi
   fi
 
-  if [[ "${backup_for}" == "complete" ]]; then
-    subdirectory=
-  fi
-
-  abs::writeln "Creating backup, using ${STYLE_COMMENT}xz${STYLE_RESET} compression"
+  abs::writeln "Creating backup, using ${STYLE_COMMENT}xz${STYLE_DEFAULT} compression"
   tar Jcf ${MCPANEL_DIRECTORY}/backup/${backup_for}/${backup_for}_${date}_${time}.txz ${MCPANEL_DIRECTORY}/process/server/${subdirectory}
   if [[ $? -ne 0 ]]; then
     abs::error "Unable to create backup for ${STYLE_COMMENT}${backup_for}"
