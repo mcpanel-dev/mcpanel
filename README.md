@@ -89,6 +89,9 @@ If the script you wrote fails, you can disable the module using `mcpanel disable
 
 ![mcpanel disable module](_docs/mcp_module-disable_simple.png)
 
+>**NEW FEATURE!** Since 2.2.0, you can add your own configuration file for your module. You **must** create a file in `[MCPANEL_ROOT]/etc` directory.
+Filename **must** respect following format: `mcp-[MODULE_NAME].cnf`, where `[MODULE_NAME]` is the name of your module
+
 #### Nice output
 I wrote Awesome Bash Stylizer (short: ABS) in order to help me have a nice output. You can demo it:
 

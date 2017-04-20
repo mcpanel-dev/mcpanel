@@ -3,7 +3,7 @@ function mcpanel::banner()
   if [[ -e /usr/bin/figlet ]]; then
     figlet "MCPanel"
   else
-    abs::comment "[figlet:MCPanel]"
+    abs::comment "MCPanel"
   fi
 }
 
@@ -12,6 +12,7 @@ function mcpanel::info()
   local version_color="${STYLE_SUCCESS}"
   local modules=()
   local ifs=$IFS
+
   abs::notice "Minecraft Server Control Panel"
   abs::notice "\tfor Linux"
 
@@ -20,6 +21,7 @@ function mcpanel::info()
     release) version_color="${STYLE_SUCCESS}";;
     testing) version_color="${STYLE_COMMENT}";;
   esac
+
   abs::writeln "Version ${version_color}${MCPANEL_VERSION}"
   abs::writeln
 
@@ -83,7 +85,7 @@ function mcpanel::synchronize_ip_address()
   abs::writeln "Server's hostname: ${STYLE_COMMENT}${host_ip}"
 
   if [[ "${gateway} == "${IFCONFIG_GATEWAY} ]] && [[ "${server_ip}" != "${host_ip}" ]]; then
-    abs::notice "Found new gateway IP address, which is gonna be replaced..."
+    abs::notice "Found new gateway IP address, which is going to be replaced..."
     sed --expression "s/${server_ip}/${host_ip}/g" --in-place "${MCPANEL_DIRECTORY}/process/server/server.properties"
     if [[ $? -ne 0 ]]; then
       abs::error "Unable to replace server's IP address"

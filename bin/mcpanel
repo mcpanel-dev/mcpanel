@@ -3,42 +3,47 @@
 declare -r MCPANEL_DIRECTORY=$(dirname $(dirname $0))
 declare -r SYSTEM_DATETIME=$(date +'%d%m%Y_%H%M%S')
 
-if [[ ! -e ${MCPANEL_DIRECTORY}/core/mcpanel/mcpanel.sh ]]; then
+echo $(dirname $0)
+echo $PWD
+
+exit
+
+if [[ ! -e "${MCPANEL_DIRECTORY}/core/mcpanel.sh" ]]; then
   echo -e "\x1B[31mThe \x1B[33m'mcpanel'\x1B[31m bootstrap library is missing!\x1B[0m"
   exit 1
 fi
 
-if [[ ! -e ${MCPANEL_DIRECTORY}/core/mcpanel/mcpanel.cnf ]]; then
+if [[ ! -e "${MCPANEL_DIRECTORY}/etc/mcpanel.cnf" ]]; then
   echo -e "\x1B[31mThe \x1B[33m'mcpanel'\x1B[31m configuration is missing!\x1B[0m"
   exit 1
 fi
 
-if [[ ! -e "${MCPANEL_DIRECTORY}/core/abs/abs.sh" ]]; then
+if [[ ! -e "${MCPANEL_DIRECTORY}/core/abs.sh" ]]; then
   echo -e "\x1B[31mThe 'Awesome Bash Stylizer' library is missing!\x1B[0m"
   exit 1
 fi
 
-if [[ ! -e "${MCPANEL_DIRECTORY}/core/abs/abs.cnf" ]]; then
+if [[ ! -e "${MCPANEL_DIRECTORY}/etc/abs.cnf" ]]; then
   echo -e "\x1B[31mThe 'Awesome Bash Stylizer' configuration is missing!\x1B[0m"
   exit 1
 fi
 
-source "${MCPANEL_DIRECTORY}/core/mcpanel/mcpanel.cnf"
-source "${MCPANEL_DIRECTORY}/core/mcpanel/mcpanel.sh"
+source "${MCPANEL_DIRECTORY}/etc/mcpanel.cnf"
+source "${MCPANEL_DIRECTORY}/core/mcpanel.sh"
 
 declare -r MCPANEL_VERSION_MAJOR=2
-declare -r MCPANEL_VERSION_MINOR=1
+declare -r MCPANEL_VERSION_MINOR=2
 declare -r MCPANEL_VERSION_PATCH=0
 declare -r MCPANEL_VERSION_CHANNEL="stable"
 declare -r MCPANEL_VERSION="${MCPANEL_VERSION_MAJOR}.${MCPANEL_VERSION_MINOR}.${MCPANEL_VERSION_PATCH}-${MCPANEL_VERSION_CHANNEL}"
-declare -r MCPANEL_MODULES=$(/bin/ls ${MCPANEL_DIRECTORY}/modules/enabled)
+declare -r MCPANEL_MODULES=$(ls ${MCPANEL_DIRECTORY}/modules/enabled)
 
 declare -r SERVER_BINARY="${SERVER_API}-${SERVER_VERSION}.jar"
 
 source "${MCPANEL_DIRECTORY}/core/abs/abs.cnf"
 source "${MCPANEL_DIRECTORY}/core/abs/abs.sh"
 
-function ::main()
+function mcpanel::main()
 {
   local module=$1
   local command=$2
@@ -99,10 +104,14 @@ function ::main()
     return 1
   fi
 
+  if [[ -z "${MCPANEL_DIRECTORY}/etc/mcp-${module}.cnf" ]]; then
+    source "${MCPANEL_DIRECTORY}/etc/mcp-${module}.cnf"
+  fi
+
   source "${MCPANEL_DIRECTORY}/modules/enabled/mcp-${module}.sh"
   mcpanel::${module}::main $command
   return $?
 }
 
-::main $@
+mcpanel::main $@
 exit $?

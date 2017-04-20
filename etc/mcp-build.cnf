@@ -1,0 +1,4 @@
+# MCPanel module configuration: build
+
+# Link from where the script downloads the latest BuildTools
+BUILD_SERVER="https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar"

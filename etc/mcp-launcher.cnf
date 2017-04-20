@@ -1,0 +1,4 @@
+# MCPanel module configuration: launcher
+
+# Type the name of your Minecraft launcher name, e.g.: launcher.jar
+MINECRAFT_LAUNCHER="launcher.jar"

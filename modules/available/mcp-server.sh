@@ -77,13 +77,13 @@ function mcpanel::server::explore
 
           case $yn in
               y|Y) mc ${MCPANEL_DIRECTORY}/process/server;;
-              n|N) abs::error "Aborting command execution as it's not supported outside xdg session"; return 1;;
+              n|N) abs::error "Aborting command execution as it's not supported outside XDG session"; return 1;;
               *) return 1;;
           esac
       fi
   else
     abs::notice "Exploring server's directory..."
-    xdg-open ${MCPANEL_DIRECTORY}/process/server
+    xdg-open "${MCPANEL_DIRECTORY}/process/server"
     wait
   fi
 
