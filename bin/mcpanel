@@ -75,9 +75,11 @@ function mcpanel::main()
     return 1
   fi
 
-  if [[ -e "${MCPANEL_DIRECTORY}/etc/mcp-${module}.cnf" ]]; then
-    source "${MCPANEL_DIRECTORY}/etc/mcp-${module}.cnf"
-  fi
+  for mod in $(ls ${MCPANEL_DIRECTORY}/modules/enabled/mcp-*); do
+    local module_name=$(basename $mod .sh)
+    source "${MCPANEL_DIRECTORY}/etc/${module_name}.cnf"
+    unset module_name
+  done
 
   source "${MCPANEL_DIRECTORY}/modules/enabled/mcp-${module}.sh"
   mcpanel::${module}::main $command

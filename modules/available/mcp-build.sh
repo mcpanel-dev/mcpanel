@@ -35,6 +35,7 @@ function mcpanel::build::update
 
 function mcpanel::build::new
 {
+  local server_binary="${SERVER_API}-${SERVER_VERSION}.jar"
   abs::notice "Starting Minecraft server build process..."
 
   if [[ ! -e BuildTools.jar ]]; then
@@ -66,7 +67,7 @@ function mcpanel::build::new
   fi
 
   abs::writeln "Copying binary to server directory"
-  cp ${MCPANEL_DIRECTORY}/process/build/${SERVER_BINARY} ${MCPANEL_DIRECTORY}/process/server
+  cp ${MCPANEL_DIRECTORY}/process/build/${server_binary} ${MCPANEL_DIRECTORY}/process/server
   if [[ $? -ne 0 ]]; then
     abs::error "Unable to copy server binary into destination!"
     return $?
