@@ -3,11 +3,6 @@
 declare -r MCPANEL_DIRECTORY=$(dirname $(dirname $0))
 declare -r SYSTEM_DATETIME=$(date +'%d%m%Y_%H%M%S')
 
-echo $(dirname $0)
-echo $PWD
-
-exit
-
 if [[ ! -e "${MCPANEL_DIRECTORY}/core/mcpanel.sh" ]]; then
   echo -e "\x1B[31mThe \x1B[33m'mcpanel'\x1B[31m bootstrap library is missing!\x1B[0m"
   exit 1
