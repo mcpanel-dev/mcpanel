@@ -1,0 +1,1 @@
+/opt/mcpanel/modules/available/mcp-server.sh

@@ -46,42 +46,18 @@ function mcpanel::main()
   mcpanel::banner
 
   if [[ "${module}" == "enable-module" ]]; then
-    if [[ -z ${command} ]]; then
-      abs::error "You must provide a module to enable!"
-      return 1
-    fi
-
-    if [[ ! -e ${MCPANEL_DIRECTORY}/modules/available/mcp-${command}.sh ]]; then
-      abs::error "Module not found: ${STYLE_COMMENT}${command}"
-      return 1
-    fi
-
-    abs::notice "Enabling module: ${STYLE_COMMENT}${command}"
-    ln -s ${MCPANEL_DIRECTORY}/modules/available/mcp-${command}.sh ${MCPANEL_DIRECTORY}/modules/enabled/mcp-${command}.sh
-    if [[ $? -ne 0 ]]; then
-      abs::error "Unable to enable module"
-      return $?
-    fi
-
-    abs::success "Module activated successfully!"
-    return 0
+    mcpanel::module::enable $command
+    return $?
   fi
 
   if [[ "${module}" == "disable-module" ]]; then
-    if [[ -z ${command} ]]; then
-      abs::error "You must provide a module to disable!"
-      return 1
-    fi
+    mcpanel::module::disable $command
+    return $?
+  fi
 
-    abs::notice "Disabling module: ${STYLE_COMMENT}${command}"
-    rm ${MCPANEL_DIRECTORY}/modules/enabled/mcp-${command}.sh
-    if [[ $? -ne 0 ]]; then
-      abs::error "Unable to disable module"
-      return $?
-    fi
-
-    abs::success "Module deactivated successfully!"
-    return 0
+  if [[ "${module}" == "list-modules" ]]; then
+    mcpanel::module::list $command
+    return $?
   fi
 
   if [[ -z "${module}" ]]; then

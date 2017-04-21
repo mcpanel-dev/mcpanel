@@ -3,7 +3,74 @@ function mcpanel::banner()
   if [[ -e /usr/bin/figlet ]]; then
     figlet "MCPanel"
   else
-    abs::comment "MCPanel"
+    abs::notice "MCPanel"
+  fi
+}
+
+function mcpanel::module::enable
+{
+  local command=$1
+  if [[ -z ${command} ]]; then
+    abs::error "You must provide a module to enable!"
+    return 1
+  fi
+
+  if [[ -e "${MCPANEL_DIRECTORY}/modules/enabled/mcp-${command}.sh" ]]; then
+    abs::error "Module already enabled: ${STYLE_COMMENT}${command}"
+    return 1
+  fi
+
+  if [[ ! -e "${MCPANEL_DIRECTORY}/modules/available/mcp-${command}.sh" ]]; then
+    abs::error "Module not found: ${STYLE_COMMENT}${command}"
+    return 1
+  fi
+
+  abs::notice "Enabling module: ${STYLE_COMMENT}${command}"
+  ln -s "${MCPANEL_DIRECTORY}/modules/available/mcp-${command}.sh" "${MCPANEL_DIRECTORY}/modules/enabled/mcp-${command}.sh"
+  if [[ $? -ne 0 ]]; then
+    abs::error "Unable to enable module"
+    return $?
+  fi
+
+  abs::success "Module activated successfully!"
+  return 0
+}
+
+function mcpanel::module::disable
+{
+  local command=$1
+  if [[ -z ${1} ]]; then
+    abs::error "You must provide a module to disable!"
+    return 1
+  fi
+
+  abs::notice "Disabling module: ${STYLE_COMMENT}${command}"
+  rm "${MCPANEL_DIRECTORY}/modules/enabled/mcp-${command}.sh"
+  if [[ $? -ne 0 ]]; then
+    abs::error "Unable to disable module"
+    return $?
+  fi
+
+  abs::success "Module deactivated successfully!"
+  return 0
+}
+
+function mcpanel::module::list
+{
+  local mode=${1:-'available'}
+  local modules=$(ls ${MCPANEL_DIRECTORY}/modules/${mode}/mcp-*.sh 2>/dev/null)
+
+  abs::writeln "MCPanel modules for ${STYLE_COMMENT}${mode}${STYLE_DEFAULT}:"
+  if [[ -z $modules ]]; then
+    abs::error "\tCurrently, there's no any modules in ${STYLE_COMMENT}${mode}"
+  else
+    for module in ${modules}; do
+      local module_full=$(basename ${module} .sh)
+      local module_name=$(echo ${module_full} | cut -d'-' -f2)
+      abs::writeln "\t- mcp-${STYLE_COMMENT}${module_name}"
+    done
+
+    abs::writeln "\nThe module's name is listed with ${STYLE_COMMENT}this color"
   fi
 }
 

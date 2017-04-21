@@ -1,3 +1,5 @@
 logs/*
 process/*
 backup/*
+modules/enabled
+!modules/enabled/.gitkeep
