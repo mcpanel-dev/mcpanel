@@ -75,7 +75,7 @@ function mcpanel::main()
     return 1
   fi
 
-  if [[ -z "${MCPANEL_DIRECTORY}/etc/mcp-${module}.cnf" ]]; then
+  if [[ -e "${MCPANEL_DIRECTORY}/etc/mcp-${module}.cnf" ]]; then
     source "${MCPANEL_DIRECTORY}/etc/mcp-${module}.cnf"
   fi
 
