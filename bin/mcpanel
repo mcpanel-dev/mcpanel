@@ -35,8 +35,8 @@ declare -r MCPANEL_MODULES=$(ls ${MCPANEL_DIRECTORY}/modules/enabled)
 
 declare -r SERVER_BINARY="${SERVER_API}-${SERVER_VERSION}.jar"
 
-source "${MCPANEL_DIRECTORY}/core/abs/abs.cnf"
-source "${MCPANEL_DIRECTORY}/core/abs/abs.sh"
+source "${MCPANEL_DIRECTORY}/etc/abs.cnf"
+source "${MCPANEL_DIRECTORY}/core/abs.sh"
 
 function mcpanel::main()
 {
