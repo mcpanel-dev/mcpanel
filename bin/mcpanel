@@ -26,7 +26,7 @@ fi
 source "${MCPANEL_DIRECTORY}/etc/mcpanel.cnf"
 source "${MCPANEL_DIRECTORY}/core/mcpanel.sh"
 
-declare -r MCPANEL_VERSION_MAJOR=1
+declare -r MCPANEL_VERSION_MAJOR=2
 declare -r MCPANEL_VERSION_MINOR=3
 declare -r MCPANEL_VERSION_PATCH=0
 declare -r MCPANEL_VERSION_CHANNEL="stable"
