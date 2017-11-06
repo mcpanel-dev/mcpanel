@@ -1,3 +1,5 @@
+declare launcherDirectory="${HOME}/.minecraft"
+
 function mcpanel::launcher::info()
 {
   abs::notice "Usage: mcpanel launcher ${STYLE_COMMENT}[command]"
@@ -11,15 +13,15 @@ function mcpanel::launcher::info()
   abs::developer "hktr92"
 }
 
-function mcpanel::launcher::start
+function mcpanel::launcher::start()
 {
-  if [[ ! -d ${HOME}/.minecraft ]]; then
-    abs::writeln "Sorry! You don't have Minecraft installed in ${STYLE_COMMENT}${HOME}/.minecraft"
+  if [[ ! -d "${launcherDirectory}" ]]; then
+    abs::writeln "Sorry! You don't have Minecraft installed in ${STYLE_COMMENT}${launcherDirectory}"
     return 1
   fi
 
   abs::notice "Starting Minecraft, please wait..."
-  cd "${HOME}/.minecraft"
+  cd "${launcherDirectory}"
   java -jar "${MINECRAFT_LAUNCHER}"
   wait
   if [[ $? -ne 0 ]]; then
@@ -30,7 +32,7 @@ function mcpanel::launcher::start
   return 0
 }
 
-function mcpanel::launcher::main
+function mcpanel::launcher::main()
 {
   local action=$1
 

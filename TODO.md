@@ -2,7 +2,7 @@ mcpanel todo
 ============
 
 Linux:
-- [ ] fix path detection issues:
+- [x] fix path detection issues:
   - if executing it as `./mcpanel`, `$MCPANEL_DIRECTORY` equals to dot
   - if executing it as `bash mcpanel`, the value is the same
   - if executing it as `mcpanel` (after putting `$MCPANEL_DIRECTORY/bin` in `PATH`, it detects well)
@@ -11,3 +11,9 @@ Linux:
 
 Windows:
 - [ ] port this panel to PowerShell
+
+Cross-platform:
+- rewrite / port this project to one of following languages:
+  - C
+  - JavaScript
+  - Python

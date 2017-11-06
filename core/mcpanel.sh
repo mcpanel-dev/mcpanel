@@ -1,3 +1,5 @@
+declare serverDirectory="${MCPANEL_DIRECTORY}/process/server"
+
 function mcpanel::banner()
 {
   if [[ -e /usr/bin/figlet ]]; then
@@ -7,7 +9,7 @@ function mcpanel::banner()
   fi
 }
 
-function mcpanel::module::enable
+function mcpanel::module::enable()
 {
   local command=$1
   if [[ -z ${command} ]]; then
@@ -36,7 +38,7 @@ function mcpanel::module::enable
   return 0
 }
 
-function mcpanel::module::disable
+function mcpanel::module::disable()
 {
   local command=$1
   if [[ -z ${1} ]]; then
@@ -55,7 +57,7 @@ function mcpanel::module::disable
   return 0
 }
 
-function mcpanel::module::list
+function mcpanel::module::list()
 {
   local mode=${1:-'available'}
   local modules=$(ls ${MCPANEL_DIRECTORY}/modules/${mode}/mcp-*.sh 2>/dev/null)
@@ -78,7 +80,6 @@ function mcpanel::info()
 {
   local version_color="${STYLE_SUCCESS}"
   local modules=()
-  local ifs=$IFS
 
   abs::notice "Minecraft Server Control Panel"
   abs::notice "\tfor Linux"
@@ -92,21 +93,27 @@ function mcpanel::info()
   abs::writeln "Version ${version_color}${MCPANEL_VERSION}"
   abs::writeln
 
+  abs::writeln "Core commands:"
+  abs::info "enable-module" "Enables a given module."
+  abs::info "disable-module" "Disables a given module."
+  abs::info "list-modules" "Displays a list of all available modules."
+  abs::writeln
+
   if [[ -z ${MCPANEL_MODULES} ]]; then
-    abs::comment "Currently there's no available commands!"
+    abs::comment "Currently there's no module enabled! Please execute ${STYLE_SUCCESS}mcpanel enable-module [module-name]"
   else
     for module in ${MCPANEL_MODULES[@]}; do
       local module_name=$(echo $module | cut -d'-' -f2)
       modules+=(${module_name%.*})
     done
-    IFS='|'; abs::writeln "List of available commands: ${STYLE_COMMENT}[${modules[*]// /|}]"; IFS=$ifs
+    abs::writeln "List of enabled modules: ${STYLE_COMMENT}[$(mcpanel::toolbox::join_by '|' "${modules[@]}")]"
   fi
 
   abs::writeln
   abs::writeln "For supplimentary info about each command(s), please check for help:"
   abs::success "\tmcpanel ${STYLE_COMMENT}[command]${STYLE_SUCCESS} help"
   abs::writeln
-  abs::writeln "Written by ${STYLE_COMMENT}hktr92"
+  abs::developer "hktr92"
 }
 
 function mcpanel::synchronize_ip_address()
@@ -139,13 +146,13 @@ function mcpanel::synchronize_ip_address()
     host_ip=$(hostname -${hostname_param} | cut -d' ' -f1)
   fi
 
-  if [[ ! -e "${MCPANEL_DIRECTORY}/process/server/server.properties" ]]; then
+  if [[ ! -e "${serverDirectory}/server.properties" ]]; then
     abs::error "Server configuration file was not found!"
     abs::writeln "Writing server IP manually..."
-    echo "server-ip=${host_ip}" > "${MCPANEL_DIRECTORY}/process/server/server.properties"
+    echo "server-ip=${host_ip}" > "${serverDirectory}/server.properties"
   fi
 
-  server_ip=$(cat "${MCPANEL_DIRECTORY}/process/server/server.properties" | grep "server-ip" | cut -d'=' -f2)
+  server_ip=$(cat "${serverDirectory}/server.properties" | grep "server-ip" | cut -d'=' -f2)
 
   abs::writeln "Server visibility level: ${STYLE_COMMENT}${visibility}"
   abs::writeln "Server's IP from configuration: ${STYLE_COMMENT}${server_ip}"
@@ -153,7 +160,7 @@ function mcpanel::synchronize_ip_address()
 
   if [[ "${gateway} == "${IFCONFIG_GATEWAY} ]] && [[ "${server_ip}" != "${host_ip}" ]]; then
     abs::notice "Found new gateway IP address, which is going to be replaced..."
-    sed --expression "s/${server_ip}/${host_ip}/g" --in-place "${MCPANEL_DIRECTORY}/process/server/server.properties"
+    sed --expression "s/${server_ip}/${host_ip}/g" --in-place "${serverDirectory}/server.properties"
     if [[ $? -ne 0 ]]; then
       abs::error "Unable to replace server's IP address"
       return $?
@@ -164,4 +171,13 @@ function mcpanel::synchronize_ip_address()
   else
     abs::notice "Host's IP address was not changed, no IP update required!"
   fi
+}
+
+function mcpanel::toolbox::join_by()
+{
+  local d=$1
+  shift
+  echo -n "$1"
+  shift
+  printf "%s" "${@/#/$d}"
 }

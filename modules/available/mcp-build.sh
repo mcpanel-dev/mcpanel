@@ -1,3 +1,6 @@
+declare build_Directory="${MCPANEL_DIRECTORY}/process/build"
+declare serverDirectory="${MCPANEL_DIRECTORY}/process/server"
+
 function mcpanel::build::info()
 {
   abs::notice "Usage: mcpanel build ${STYLE_COMMENT}[command]"
@@ -12,11 +15,11 @@ function mcpanel::build::info()
   abs::developer "hktr92"
 }
 
-function mcpanel::build::update
+function mcpanel::build::update()
 {
-  if [[ ! -d ${MCPANEL_DIRECTORY}/build ]]; then
+  if [[ ! -d "${build_Directory}" ]]; then
     abs::writeln "Creating build directory"
-    mkdir -p ${MCPANEL_DIRECTORY}/process/build
+    mkdir -p "${build_Directory}"
     if [[ $? -ne 0 ]]; then
       abs::error "Unable to create directory for build tools!"
       return $?
@@ -24,7 +27,8 @@ function mcpanel::build::update
   fi
 
   abs::notice "Fetching BuildTools, please wait..."
-  wget --output-document="${MCPANEL_DIRECTORY}/process/build/BuildTools.jar" ${BUILD_SERVER}
+  cd "${build_Directory}"
+  wget --quiet --show-progress --timestamping "${BUILD_SERVER}"
   if [[ $? -ne 0 ]]; then
     abs::error "Sorry, the download of build tools failed!"
     return $?
@@ -33,17 +37,17 @@ function mcpanel::build::update
   return 0
 }
 
-function mcpanel::build::new
+function mcpanel::build::new()
 {
   local server_binary="${SERVER_API}-${SERVER_VERSION}.jar"
   abs::notice "Starting Minecraft server build process..."
 
-  if [[ ! -e BuildTools.jar ]]; then
+  if [[ ! -e "${build_Directory}/BuildTools.jar" ]]; then
     abs::error "Unable to find BuildTools.jar into build directory!"
     mcpanel::build::update
   fi
 
-  cd ${MCPANEL_DIRECTORY}/process/build/
+  cd "${build_Directory}"
 
   abs::writeln "Selected API: ${STYLE_COMMENT}${SERVER_API}"
   abs::writeln "Selected API version: ${STYLE_COMMENT}${SERVER_VERSION}"
@@ -56,9 +60,9 @@ function mcpanel::build::new
   fi
   abs::success "Server build finished without errors!"
 
-  if [[ ! -e "${MCPANEL_DIRECTORY}/process/server" ]]; then
+  if [[ ! -e "${serverDirectory}" ]]; then
     abs::notice "Creating server directory..."
-    mkdir -p ${MCPANEL_DIRECTORY}/process/server
+    mkdir -p "${serverDirectory}"
     if [[ $? -ne 0 ]]; then
       abs::error "Unable to create server directory!"
       return $?
@@ -67,7 +71,7 @@ function mcpanel::build::new
   fi
 
   abs::writeln "Copying binary to server directory"
-  cp ${MCPANEL_DIRECTORY}/process/build/${server_binary} ${MCPANEL_DIRECTORY}/process/server
+  cp "${build_Directory}/${server_binary}" "${serverDirectory}"
   if [[ $? -ne 0 ]]; then
     abs::error "Unable to copy server binary into destination!"
     return $?
@@ -77,7 +81,7 @@ function mcpanel::build::new
   return 0
 }
 
-function mcpanel::build::main
+function mcpanel::build::main()
 {
   local action=$1
 

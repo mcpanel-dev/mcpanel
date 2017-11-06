@@ -1,11 +1,11 @@
 MCPanel
 =======
 
-This utility was written in order to manage a Minecraft server in my computer.
+This utility was written in order to manage a Minecraft server installed on my Linux computer.
 
 
 
-MCPanel version: 2.1.0
+MCPanel version: 2.3.0
 
 MCPanel channel: stable
 
@@ -18,11 +18,12 @@ MCPanel channel: stable
 ## Requirements:
 - mandatory:
   - [ ] bash 4.0+
-  - [ ] figlet
-  - [ ] Java 7
+  - [ ] figlet (for displaying mcpanel banner)
+  - [ ] Java 7 or newer
+  - [ ] jq command (for parsing json in cli)
 
 - optional:
-  - [ ] midnight commander
+  - [ ] midnight commander (for exploring filesystem on server's directory in cli mode)
 
 --------
 
@@ -35,7 +36,7 @@ MCPanel is completely modular, so you can add your own extensions as you like. Y
 into `modules/available` directory, with prefix `mcp-` and suffix `.sh`. It **must** contain the following
 structure:
 ```shell
-function mcpanel::MODULE_NAME::info
+function mcpanel::MODULE_NAME::info()
 {
   # module usage
   abs::notice "Usage: mcpanel MODULE_NAME [command]"
@@ -54,17 +55,17 @@ function mcpanel::MODULE_NAME::info
   abs::developer "hktr92"
 }
 
-function mcpanel::MODULE_NAME::command_one
+function mcpanel::MODULE_NAME::command_one()
 {
   # command-one code
 }
 
-function mcpanel::MODULE_NAME::command_two
+function mcpanel::MODULE_NAME::command_two()
 {
   # ...
 }
 
-function mcpanel::MODULE_NAME::main
+function mcpanel::MODULE_NAME::main()
 {
   # first parameter passed to this function represents the command executed
   local command=$1
@@ -102,15 +103,17 @@ This is an approximate output:
 ![awesome bash stylizer demo](_docs/mcp_abs_demo.png)
 
 #### Easy to configure
-You have to edit *only* `core/mcpanel/mcpanel.cnf` for this task!
+~~You have to edit *only* `core/mcpanel/mcpanel.cnf` for this task!~~
+
+Since 2.2, all configuration variables from this file was moved into `[MCPANEL_ROOT]/etc` directory.
 
 #### IP address synchronization
-Because my router is malfunctioning, it gives me random internal IP address (e.g.: now it's 192.168.1.2, after a while it becomes 192.168.1.6, and so on), I wrote a function that synchronizes `server.properties` with three levels of IP addresses: local (which is, 127.0.0.1), lan (which is taken from `hostname` command), public (which is queried using `dig`). I've updated this function in the last moment, so I don't know exactly if this works for public IP (as I can't test it). Please feel free to submit issue with this.
+Because my router is malfunctioning, it gives me random internal IP address (e.g.: now it's 192.168.1.2, after a while it becomes 192.168.1.6, and so on), I wrote a function that synchronizes `server.properties` with three levels of IP addresses: local (which is, 127.0.0.1), LAN (which is taken from `hostname` command), public (which is queried using `dig`). I've updated this function in the last moment, so I don't know exactly if this works for public IP (as I can't test it). Please feel free to submit issue with this.
 
 --------
 
 #### Included modules
-I personally developed and included two modules: build and server.
+I personally developed and included two modules: `build` and `server`.
 
 The `build` module downloads [BuildTools](https://www.spigotmc.org/wiki/buildtools/) automatically into `process/build` directory.
 Then, the binary is copied from `process/build` into `process/server`.
@@ -120,12 +123,14 @@ It haves commands like `edit`, which allows you edit `server.properties` using y
 Another command is `logs`, which `tail`s the `process/server/logs/latest.log` in order to see what is wrong with your server.
 Also, there's a command called `explore`, which works perfectly on (almost) any desktop environment. It opens the associated file explorer using `xdg-open` and you can browse server contents. It won't work if you're not having a DE, unless you have an utility called "Midnight Commander" (known as `mc`). You'll be prompted if you like to explore the server using that utility.
 
+Since 2.0, additional modules were written:
+- `plugins` => installs basic plugins: Essentials, WorldEdit. Next release will cover the possibility to download additional plugins by putting an URL into an array or file.
+- `launcher` => opens up Minecraft launcher from `${HOME}/.minecraft` directory. Providing the launcher is your deal.
+- `backup` => backs up the entire server, or only plugins, or only worlds. Your choice. It does not provide restore options!
+
 #### How it works?
 Modules are automatically `source`d from `modules/enabled` when you execute the `module`'s name.
 After that, the `main` function under `mcpanel::${module}` namespace is loaded, and `${command}` argument is passed automatically.
-
-#### Why version 2.0?
-It's because the first version was made in haste and used for a very long time. I decided to rewrite that one, which was versioned 1.x. I'll upload that code very soon, on a different branch!
 
 #### License
 MCPanel is licensed under MIT license.

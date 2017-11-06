@@ -1,0 +1,6 @@
+plugin_WorldEdit="https://dev.bukkit.org/projects/worldedit/files/latest"
+plugin_AsyncWorldEdit_baseUrl="https://api.github.com/repos/SBPrime/AsyncWorldEdit/releases/latest"
+plugin_AsyncWorldEdit_jars="AsyncWorldEdit|AsyncWorldEditInjector"
+
+plugin_Essentials_baseUrl="https://hub.spigotmc.org/jenkins/job/spigot-essentials/lastSuccessfulBuild/artifact/%s/target/%s-2.x-SNAPSHOT.jar"
+plugin_Essentials_jars=("Essentials" "EssentialsAntiBuild" "EssentialsProtect" "EssentialsSpawn")

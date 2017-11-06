@@ -10,7 +10,7 @@ IFCONFIG_INETADDR=inet
 SERVER_API=spigot
 
 # Server version
-SERVER_VERSION=1.11.2
+SERVER_VERSION=1.12.2
 
 # Server memory, power of 1024, in M
 SERVER_MEMORY=1024

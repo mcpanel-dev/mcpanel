@@ -26,8 +26,8 @@ fi
 source "${MCPANEL_DIRECTORY}/etc/mcpanel.cnf"
 source "${MCPANEL_DIRECTORY}/core/mcpanel.sh"
 
-declare -r MCPANEL_VERSION_MAJOR=2
-declare -r MCPANEL_VERSION_MINOR=2
+declare -r MCPANEL_VERSION_MAJOR=1
+declare -r MCPANEL_VERSION_MINOR=3
 declare -r MCPANEL_VERSION_PATCH=0
 declare -r MCPANEL_VERSION_CHANNEL="stable"
 declare -r MCPANEL_VERSION="${MCPANEL_VERSION_MAJOR}.${MCPANEL_VERSION_MINOR}.${MCPANEL_VERSION_PATCH}-${MCPANEL_VERSION_CHANNEL}"
@@ -66,12 +66,12 @@ function mcpanel::main()
   fi
 
   if [[ ! -e "${MCPANEL_DIRECTORY}/modules/enabled/mcp-${module}.sh" ]] && [[ ! -e "${MCPANEL_DIRECTORY}/modules/available/mcp-${module}.sh" ]]; then
-    abs::error "mcpanel: error: module not found: ${STYLE_COMMENT}${module}"
+    abs::error "mcpanel: error: module not found: ${STYLE_SUCCESS}${module}"
     return 1
   fi
 
   if [[ ! -e "${MCPANEL_DIRECTORY}/modules/enabled/mcp-${module}.sh" ]] && [[ -e "${MCPANEL_DIRECTORY}/modules/available/mcp-${module}.sh" ]]; then
-    abs::comment "mcpanel: warning: module is available, but not enabled: ${STYLE_COMMENT}${module}"
+    abs::comment "mcpanel: warning: module is available, but not enabled: ${STYLE_SUCCESS}${module}"
     return 1
   fi
 
