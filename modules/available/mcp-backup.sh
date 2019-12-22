@@ -19,9 +19,9 @@ function mcpanel::backup::info()
 function mcpanel::backup::_compress()
 {
   local backup_for=$1
-  local subdirectory=$backup_for
+  local subdirectory=${backup_for}
 
-  case $backup_for in
+  case ${backup_for} in
     complete)
       subdirectory=
       ;;
@@ -86,7 +86,7 @@ function mcpanel::backup::main()
 {
   local action=$1
 
-  case $action in
+  case ${action} in
     complete) mcpanel::backup::complete;;
     plugins) mcpanel::backup::plugins;;
     world) mcpanel::backup::world;;

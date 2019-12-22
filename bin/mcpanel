@@ -27,7 +27,7 @@ source "${MCPANEL_DIRECTORY}/etc/mcpanel.cnf"
 source "${MCPANEL_DIRECTORY}/core/mcpanel.sh"
 
 declare -r MCPANEL_VERSION_MAJOR=2
-declare -r MCPANEL_VERSION_MINOR=3
+declare -r MCPANEL_VERSION_MINOR=4
 declare -r MCPANEL_VERSION_PATCH=0
 declare -r MCPANEL_VERSION_CHANNEL="stable"
 declare -r MCPANEL_VERSION="${MCPANEL_VERSION_MAJOR}.${MCPANEL_VERSION_MINOR}.${MCPANEL_VERSION_PATCH}-${MCPANEL_VERSION_CHANNEL}"
@@ -46,17 +46,17 @@ function mcpanel::main()
   mcpanel::banner
 
   if [[ "${module}" == "enable-module" ]]; then
-    mcpanel::module::enable $command
+    mcpanel::module::enable ${command}
     return $?
   fi
 
   if [[ "${module}" == "disable-module" ]]; then
-    mcpanel::module::disable $command
+    mcpanel::module::disable ${command}
     return $?
   fi
 
   if [[ "${module}" == "list-modules" ]]; then
-    mcpanel::module::list $command
+    mcpanel::module::list ${command}
     return $?
   fi
 
@@ -76,13 +76,19 @@ function mcpanel::main()
   fi
 
   for mod in $(ls ${MCPANEL_DIRECTORY}/modules/enabled/mcp-*); do
-    local module_name=$(basename $mod .sh)
-    source "${MCPANEL_DIRECTORY}/etc/${module_name}.cnf"
+    local module_name=$(basename ${mod} .sh)
+    local module_config="${MCPANEL_DIRECTORY}/etc/${module_name}.cnf"
+
+    if [[ -e ${module_config} ]]; then
+        source ${module_config}
+    fi
+
+    unset module_config
     unset module_name
   done
 
   source "${MCPANEL_DIRECTORY}/modules/enabled/mcp-${module}.sh"
-  mcpanel::${module}::main $command
+  mcpanel::${module}::main ${command}
   return $?
 }
 

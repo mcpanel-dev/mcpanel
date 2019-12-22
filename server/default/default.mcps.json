@@ -1,0 +1,9 @@
+{
+  "name": "mcpanel-default",
+  "description": "The default MCPanel Server setup with basic plugins",
+  "version": "1.0.0",
+  "server": {
+    "type": "spigotmc",
+    "version": "1.15.1"
+  }
+}

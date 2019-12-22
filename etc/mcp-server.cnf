@@ -10,13 +10,23 @@ IFCONFIG_INETADDR=inet
 SERVER_API=spigot
 
 # Server version
-SERVER_VERSION=1.12.2
+SERVER_VERSION=1.15.1
 
 # Server memory, power of 1024, in M
-SERVER_MEMORY=1024
+SERVER_MEMORY_MAX=1536 #1024
+SERVER_MEMORY_SCALING_STEP=512
+# Which Java GC should be used. CMS is deprecated, G1 is prefered
+JAVA_GC=ConcMarkSweep
 
 # Server visibility levels: public, lan, local
-SERVER_DEFAULT_VISIBILITY=local
+SERVER_DEFAULT_VISIBILITY=public
 
 # Automatically agree with EULA? (https://account.mojang.com/documents/minecraft_eula)
 SERVER_AUTO_EULA=true
+
+# Server template
+# The template on which the server will run on.
+# If you want to have the legacy behavior, keep SERVER_TEMPLATE empty.
+SERVER_TEMPLATE=default
+
+SERVER_TMUXED=true

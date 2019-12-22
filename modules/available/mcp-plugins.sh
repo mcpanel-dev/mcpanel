@@ -47,7 +47,7 @@ function mcpanel::plugins::download()
   mcpanel::plugins::generateDownloadList
 
   abs::writeln "Getting WorldEdit.jar..."
-  wget $plugin_WorldEdit --output-document="${PLUGIN_DIR}/WorldEdit.jar" --quiet --show-progress
+  wget ${plugin_WorldEdit} --output-document="${PLUGIN_DIR}/WorldEdit.jar" --quiet --show-progress
   if [[ $? -ne 0 ]]; then
     abs::error "Unable to wget WorldEdit jar!"
     return $?
@@ -87,7 +87,7 @@ function mcpanel::plugins::main()
     return 1
   fi
 
-  case $action in
+  case ${action} in
      get) mcpanel::plugins::install;;
     help|*) mcpanel::plugins::info;;
   esac

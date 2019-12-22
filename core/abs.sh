@@ -6,11 +6,11 @@ function abs::writeln
   local style=${2:-${STYLE_DEFAULT}}
   local logfile=${3:-"${MCPANEL_DIRECTORY}/logs/mcpanel.log"}
 
-  if [[ ! -d $(dirname $logfile) ]]; then
-    mkdir -p $(dirname $logfile)
+  if [[ ! -d $(dirname ${logfile}) ]]; then
+    mkdir -p $(dirname ${logfile})
   fi
 
-  echo -e "${style}${output}${STYLE_DEFAULT}" | tee --append $logfile
+  echo -e "${style}${output}${STYLE_DEFAULT}" | tee --append ${logfile}
 }
 
 function abs::info

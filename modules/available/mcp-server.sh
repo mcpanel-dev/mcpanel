@@ -1,4 +1,10 @@
-declare serverDirectory="${MCPANEL_DIRECTORY}/process/server"
+if [[ -z ${SERVER_TEMPLATE} ]]; then
+    declare serverTemplate=true
+    declare serverDirectory="${MCPANEL_DIRECTORY}/process/server"
+else
+    declare serverTemplate=false
+    declare serverDirectory="${MCPANEL_DIRECTORY}/server/${SERVER_TEMPLATE}"
+fi
 
 function mcpanel::server::info()
 {
@@ -16,30 +22,50 @@ function mcpanel::server::info()
   abs::developer "hktr92"
 }
 
-function mcpanel::server::start()
+function mcpanel::server::start ()
 {
   local visibility=${1:-${SERVER_DEFAULT_VISIBILITY}}
   local gateway=
+  local instance_prefix=
+
+  if [[ ${SERVER_TMUXED} ]] && [[ ! -n "${TMUX}" ]]; then
+    local has_tmux=$(tmux list-session | grep mcpanel | cut -d: -f1)
+
+    if [[ ${has_tmux} == 'mcpanel' ]]; then
+        tmux kill-session -t ${has_tmux}
+    fi
+
+    instance_prefix='tmux new -d -s mcpanel'
+
+    abs::notice "Instance tmuxed, name=mcpanel"
+  fi
 
   abs::notice "Starting Minecraft server"
 
-  case $visibility in
-    local) gateway="lo";;
+  case ${visibility} in
+    private) gateway="lo";;
     lan) gateway=${IFCONFIG_GATEWAY};;
     public) gateway=;;
     *) abs::error "Invalid server visibility: ${visibility}"; return 1;;
   esac
 
   abs::writeln "Synchronizing server IPs"
-  mcpanel::synchronize_ip_address $visibility $gateway
+  mcpanel::synchronize_ip_address ${visibility} ${gateway}
 
   cd "${serverDirectory}"
+  if [[ ${serverTemplate} ]]; then
+    abs::notice "Starting from '${SERVER_TEMPLATE}' server template."
+  else
+    abs::notice "Starting from legacy server directory."
+  fi
+
   if [[ ${SERVER_AUTO_EULA} ]] && [[ ! -e "eula.txt" ]]; then
     abs::writeln "Agreeing with eula.txt automatically"
     echo "eula=true" > "eula.txt"
   fi
 
-  java -Xmx${SERVER_MEMORY}M -jar "${SERVER_API}-${SERVER_VERSION}.jar" nogui
+  ${instance_prefix} java -Xms${SERVER_MEMORY_SCALING_STEP}M -Xmx${SERVER_MEMORY_MAX}M -XX:+Use${JAVA_GC}GC -jar "${SERVER_API}-${SERVER_VERSION}.jar" nogui
+
   if [[ $? -ne 0 ]]; then
     abs::error "Server startup failed"
     return $?
@@ -77,7 +103,7 @@ function mcpanel::server::explore()
           abs::notice "However, it seems that you have installed \x1B[33mMidnight Commander\x1B[36m on your system."
           read -p "Do you want to use it? " yn
 
-          case $yn in
+          case ${yn} in
               y|Y) mc "${serverDirectory}" "${serverDirectory}";;
               n|N) abs::error "Aborting command execution as it's not supported outside XDG session"; return 1;;
               *) return 1;;
@@ -96,8 +122,8 @@ function mcpanel::server::main()
 {
   local action=$1
 
-  case $action in
-    start) mcpanel::server::start $2;;
+  case ${action} in
+    start) mcpanel::server::start;;
     edit) mcpanel::server::edit;;
     logs) mcpanel::server::logs;;
     explore) mcpanel::server::explore;;

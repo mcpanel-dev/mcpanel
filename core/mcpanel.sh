@@ -63,7 +63,7 @@ function mcpanel::module::list()
   local modules=$(ls ${MCPANEL_DIRECTORY}/modules/${mode}/mcp-*.sh 2>/dev/null)
 
   abs::writeln "MCPanel modules for ${STYLE_COMMENT}${mode}${STYLE_DEFAULT}:"
-  if [[ -z $modules ]]; then
+  if [[ -z ${modules} ]]; then
     abs::error "\tCurrently, there's no any modules in ${STYLE_COMMENT}${mode}"
   else
     for module in ${modules}; do
@@ -103,7 +103,7 @@ function mcpanel::info()
     abs::comment "Currently there's no module enabled! Please execute ${STYLE_SUCCESS}mcpanel enable-module [module-name]"
   else
     for module in ${MCPANEL_MODULES[@]}; do
-      local module_name=$(echo $module | cut -d'-' -f2)
+      local module_name=$(echo ${module} | cut -d'-' -f2)
       modules+=(${module_name%.*})
     done
     abs::writeln "List of enabled modules: ${STYLE_COMMENT}[$(mcpanel::toolbox::join_by '|' "${modules[@]}")]"
@@ -124,7 +124,7 @@ function mcpanel::synchronize_ip_address()
   local server_ip=
   local host_ip=
 
-  case $visibility in
+  case ${visibility} in
     local)
       hostname_param="i"
       ;;

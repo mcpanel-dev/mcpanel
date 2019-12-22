@@ -1,0 +1,20 @@
+MCPanel v2.4.0:
+- [mcpanel] fixed notice when trying to load non-existent module config file
+- [mcpanel] added support for server templates. only put your server files, wire it up and you're good to go!
+- [mcp-server] updated java exec params to reflect with latest SpigotMC one (Java GC can be customized)
+- [mcp-server] server instance now is `tmux`ed if not inside of `tmux`. attach via `tmux a -t mcpanel`. to disable this feature, set `SERVER_TMUXED` to false 
+- [mcpanel] fixed code style inconsistencies
+- [mcpanel] added a Dockerfile based on [https://github.com/tclavier/docker-scriptcraft/blob/master/Dockerfile](docker-scriptcraft) repository
+- [server/default] added default server template:
+    - plugins:
+        - `AmkMcAuth` v1.4.1
+        - `WorldEdit` v7.1.0-beta.1
+    - `default.mcps.json`:
+        - server api: spigot
+        - server version: 1.15.1
+    - `bukkit.yml` config:
+        - set `settings.world-container` to `maps/` directory
+        - set `settings.shutdown-message` to [https://twitter.com/esmailcorp/status/1088076644823285760](`Goodbye, friend!`)
+    - `spigot.yml` config:
+        - set `settings.restart-script` to `/opt/mcpanel/bin/mcpanel server start`
+        - set `settings.restart-on-crash` to `true`
