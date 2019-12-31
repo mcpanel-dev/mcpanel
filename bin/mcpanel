@@ -3,6 +3,8 @@
 declare -r MCPANEL_DIRECTORY=$(dirname $(dirname $0))
 declare -r SYSTEM_DATETIME=$(date +'%d%m%Y_%H%M%S')
 
+declare -a MCPANEL_PARAMS=()
+
 if [[ ! -e "${MCPANEL_DIRECTORY}/core/mcpanel.sh" ]]; then
   echo -e "\x1B[31mThe \x1B[33m'mcpanel'\x1B[31m bootstrap library is missing!\x1B[0m"
   exit 1
@@ -28,12 +30,10 @@ source "${MCPANEL_DIRECTORY}/core/mcpanel.sh"
 
 declare -r MCPANEL_VERSION_MAJOR=2
 declare -r MCPANEL_VERSION_MINOR=4
-declare -r MCPANEL_VERSION_PATCH=0
+declare -r MCPANEL_VERSION_PATCH=1
 declare -r MCPANEL_VERSION_CHANNEL="stable"
 declare -r MCPANEL_VERSION="${MCPANEL_VERSION_MAJOR}.${MCPANEL_VERSION_MINOR}.${MCPANEL_VERSION_PATCH}-${MCPANEL_VERSION_CHANNEL}"
-declare -r MCPANEL_MODULES=$(ls ${MCPANEL_DIRECTORY}/modules/enabled)
-
-declare -r SERVER_BINARY="${SERVER_API}-${SERVER_VERSION}.jar"
+declare -r MCPANEL_MODULES=$(ls "${MCPANEL_DIRECTORY}/modules/enabled")
 
 source "${MCPANEL_DIRECTORY}/etc/abs.cnf"
 source "${MCPANEL_DIRECTORY}/core/abs.sh"
@@ -43,20 +43,22 @@ function mcpanel::main()
   local module=$1
   local command=$2
 
+#  MCPANEL_PARAMS=mcpanel::toolbox::parseOptions ${@:3}
+
   mcpanel::banner
 
   if [[ "${module}" == "enable-module" ]]; then
-    mcpanel::module::enable ${command}
+    mcpanel::module::enable ${@:2}
     return $?
   fi
 
   if [[ "${module}" == "disable-module" ]]; then
-    mcpanel::module::disable ${command}
+    mcpanel::module::disable ${@:2}
     return $?
   fi
 
   if [[ "${module}" == "list-modules" ]]; then
-    mcpanel::module::list ${command}
+    mcpanel::module::list ${command} # mode: available, enabled
     return $?
   fi
 
@@ -76,19 +78,19 @@ function mcpanel::main()
   fi
 
   for mod in $(ls ${MCPANEL_DIRECTORY}/modules/enabled/mcp-*); do
-    local module_name=$(basename ${mod} .sh)
-    local module_config="${MCPANEL_DIRECTORY}/etc/${module_name}.cnf"
+    local moduleName=$(basename "${mod}" ".sh")
+    local moduleConfig="${MCPANEL_DIRECTORY}/etc/${moduleName}.cnf"
 
-    if [[ -e ${module_config} ]]; then
-        source ${module_config}
+    if [[ -e ${moduleConfig} ]]; then
+        source ${moduleConfig}
     fi
 
-    unset module_config
-    unset module_name
+    unset moduleConfig
+    unset moduleName
   done
 
   source "${MCPANEL_DIRECTORY}/modules/enabled/mcp-${module}.sh"
-  mcpanel::${module}::main ${command}
+  mcpanel::${module}::main "${command}" ${@:2}
   return $?
 }
 

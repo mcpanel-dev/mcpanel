@@ -1,4 +1,4 @@
-if [[ -z ${SERVER_TEMPLATE} ]]; then
+if [[ -z "${SERVER_TEMPLATE}" ]]; then
     declare serverTemplate=true
     declare serverDirectory="${MCPANEL_DIRECTORY}/process/server"
 else
@@ -22,35 +22,35 @@ function mcpanel::server::info()
   abs::developer "hktr92"
 }
 
-function mcpanel::server::start ()
+function mcpanel::server::start()
 {
   local visibility=${1:-${SERVER_DEFAULT_VISIBILITY}}
-  local gateway=
-  local instance_prefix=
+  local gateway=""
+  local instancePrefix=""
 
   if [[ ${SERVER_TMUXED} ]] && [[ ! -n "${TMUX}" ]]; then
-    local has_tmux=$(tmux list-session | grep mcpanel | cut -d: -f1)
+    local hasTmux=$(tmux list-session | grep "mcpanel" | cut -d: -f1)
 
-    if [[ ${has_tmux} == 'mcpanel' ]]; then
-        tmux kill-session -t ${has_tmux}
+    if [[ ${hasTmux} == 'mcpanel' ]]; then
+        tmux kill-session -t ${hasTmux}
     fi
 
-    instance_prefix='tmux new -d -s mcpanel'
+    instancePrefix='tmux new -s mcpanel'
 
     abs::notice "Instance tmuxed, name=mcpanel"
   fi
 
   abs::notice "Starting Minecraft server"
 
-  case ${visibility} in
+  case "${visibility}" in
     private) gateway="lo";;
-    lan) gateway=${IFCONFIG_GATEWAY};;
+    lan) gateway="${IFCONFIG_GATEWAY}";;
     public) gateway=;;
     *) abs::error "Invalid server visibility: ${visibility}"; return 1;;
   esac
 
   abs::writeln "Synchronizing server IPs"
-  mcpanel::synchronize_ip_address ${visibility} ${gateway}
+  mcpanel::toolbox::synchronizeIpAddress "${visibility}" "${gateway}"
 
   cd "${serverDirectory}"
   if [[ ${serverTemplate} ]]; then
@@ -64,7 +64,7 @@ function mcpanel::server::start ()
     echo "eula=true" > "eula.txt"
   fi
 
-  ${instance_prefix} java -Xms${SERVER_MEMORY_SCALING_STEP}M -Xmx${SERVER_MEMORY_MAX}M -XX:+Use${JAVA_GC}GC -jar "${SERVER_API}-${SERVER_VERSION}.jar" nogui
+  ${instancePrefix} java -Xms${SERVER_MEMORY_SCALING_STEP}M -Xmx${SERVER_MEMORY_MAX}M -XX:+Use${JAVA_GC}GC -jar "${SERVER_API}-${SERVER_VERSION}.jar" nogui
 
   if [[ $? -ne 0 ]]; then
     abs::error "Server startup failed"
@@ -121,6 +121,11 @@ function mcpanel::server::explore()
 function mcpanel::server::main()
 {
   local action=$1
+  local localServerTemplate=$2
+
+  if [[ ! -z "${localServerTemplate}" ]]; then
+    SERVER_TEMPLATE="${localServerTemplate}"
+  fi
 
   case ${action} in
     start) mcpanel::server::start;;

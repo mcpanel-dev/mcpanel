@@ -20,7 +20,7 @@ function mcpanel::plugins::info()
 function mcpanel::plugins::generateDownloadList_AsyncWorldEdit()
 {
   abs::writeln "Getting latest AsyncWorldEdit build list..."
-  curl --silent "${plugin_AsyncWorldEdit_baseUrl}" | jq --raw-output ".assets[] | select(.name | test(\"(${plugin_AsyncWorldEdit_jars}).jar\")) | .browser_download_url" >> "${PLUGIN_LIST}"
+  mcpanel::toolbox::fetch "${plugin_AsyncWorldEdit_baseUrl}" | jq --raw-output ".assets[] | select(.name | test(\"(${plugin_AsyncWorldEdit_jars}).jar\")) | .browser_download_url" >> "${PLUGIN_LIST}"
   if [[ $? -ne 0 ]]; then
     abs::error "Unable to cURL GitHub API to fetch latest AsyncWorldEdit build!"
     return $?
@@ -47,7 +47,7 @@ function mcpanel::plugins::download()
   mcpanel::plugins::generateDownloadList
 
   abs::writeln "Getting WorldEdit.jar..."
-  wget ${plugin_WorldEdit} --output-document="${PLUGIN_DIR}/WorldEdit.jar" --quiet --show-progress
+  mcpanel::toolbox::download "${plugin_worldEdit}" "${PLUGIN_DIR}/WorldEdit.jar"
   if [[ $? -ne 0 ]]; then
     abs::error "Unable to wget WorldEdit jar!"
     return $?
@@ -56,7 +56,12 @@ function mcpanel::plugins::download()
 
   abs::writeln "Downloading plugins from list..."
   cd "${PLUGIN_DIR}"
-  wget --input-file="${PLUGIN_LIST}" --quiet --show-progress --timestamping
+
+  for plugin in $(cat "${PLUGIN_LIST}"); do
+    local destinationFile=${plugin##*/}
+    mcpanel::toolbox::download "${plugin}" "${PLUGIN_DIR}/${destinationFile}"
+  done
+#  wget --input-file="${PLUGIN_LIST}" --quiet --show-progress --timestamping
   if [[ $? -ne 0 ]]; then
     abs::error "Unable to download plugins."
     return $?
@@ -81,13 +86,15 @@ function mcpanel::plugins::main()
 {
   local action=$1
 
-  if [[ -z $(which jq) ]]; then
+  which jq > /dev/null
+  if [[ $? -ne 0 ]]; then
     abs::error "In order to use this feature, you must install ${STYLE_SUCCESS}jq${STYLE_ERROR} CLI JSON parser."
     abs::error "https://github.com/stedolan/jq"
+
     return 1
   fi
 
-  case ${action} in
+  case "${action}" in
      get) mcpanel::plugins::install;;
     help|*) mcpanel::plugins::info;;
   esac

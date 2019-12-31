@@ -5,9 +5,7 @@ if [[ ! -z ${SERVER_TEMPLATE} ]]; then
     declare serverDirectory="${MCPANEL_DIRECTORY}/server/${SERVER_TEMPLATE}"
 else
     declare serverTemplate=false
-    #@deprecated
     declare serverDirectory="${MCPANEL_DIRECTORY}/process/server"
-    #@enddeprecated
 fi
 
 function mcpanel::build::info()
@@ -37,7 +35,7 @@ function mcpanel::build::update()
 
   abs::notice "Fetching BuildTools, please wait..."
   cd "${buildDirectory}"
-  wget --quiet --show-progress --timestamping "${BUILD_SERVER}"
+  mcpanel::toolbox::download "${BUILD_SERVER}"
   if [[ $? -ne 0 ]]; then
     abs::error "Sorry, the download of build tools failed!"
     return $?
@@ -48,7 +46,7 @@ function mcpanel::build::update()
 
 function mcpanel::build::new()
 {
-  local server_binary="${SERVER_API}-${SERVER_VERSION}.jar"
+  local serverBinary="${SERVER_API}-${SERVER_VERSION}.jar"
   abs::notice "Starting Minecraft server build process..."
 
   if [[ ! -e "${buildDirectory}/BuildTools.jar" ]]; then
@@ -82,7 +80,7 @@ function mcpanel::build::new()
   #@enddeprecated
 
   abs::writeln "Copying binary to server directory"
-  cp "${buildDirectory}/${server_binary}" "${serverDirectory}"
+  cp "${buildDirectory}/${serverBinary}" "${serverDirectory}"
   if [[ $? -ne 0 ]]; then
     abs::error "Unable to copy server binary into destination!"
     return $?
@@ -99,8 +97,13 @@ function mcpanel::build::new()
 function mcpanel::build::main()
 {
   local action=$1
+  local localServerTemplate=$2
 
-  case ${action} in
+  if [[ ! -z "${localServerTemplate}" ]]; then
+    SERVER_TEMPLATE="${localServerTemplate}"
+  fi
+
+  case "${action}" in
     new) mcpanel::build::new;;
     update) mcpanel::build::update;;
     help|*) mcpanel::build::info;;

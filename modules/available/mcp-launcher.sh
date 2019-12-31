@@ -36,7 +36,7 @@ function mcpanel::launcher::main()
 {
   local action=$1
 
-  case ${action} in
+  case "${action}" in
     start) mcpanel::launcher::start;;
     help|*) mcpanel::launcher::info;;
   esac

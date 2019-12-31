@@ -21,6 +21,8 @@ MCPanel channel: stable
   - [ ] figlet (for displaying mcpanel banner)
   - [ ] Java 7 or newer
   - [ ] jq command (for parsing json in cli)
+  - [ ] yq command (for parsing yaml files) [installation guide](http://mikefarah.github.io/yq/)
+  - [ ] `wget` or `curl` for file download
 
 - optional:
   - [ ] midnight commander (for exploring filesystem on server's directory in cli mode)

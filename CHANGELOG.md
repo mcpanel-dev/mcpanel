@@ -1,3 +1,15 @@
+MCPanel v2.4.1:
+- [mcpanel] module call now receives all positional arguments after position 2 (0 = main script, 1 = module, 2 = action, 3+ = other arguments)
+- [mcp-server] now you can pass server template name when calling `server:start`
+- [mcp-build] now you can pass server template name when calling `build:new`
+- [server/default] changed MCPanel config from `{template_name}.mcps.json` to `mcpanel.{ts|js|json|json5}`
+- [mcpanel] fixed more code inconsistencies
+- [mcpanel] removed dead code
+- [mcpanel] core commands (`enable-module` and `disable-module`) now accepts multiple module names
+- [mcp-backup] added support for `server-templates`
+- [mcpanel] added dependency for `yq` [check documentation](http://mikefarah.github.io/yq/)
+- [mcp-abs] now the demo is called by default
+
 MCPanel v2.4.0:
 - [mcpanel] fixed notice when trying to load non-existent module config file
 - [mcpanel] added support for server templates. only put your server files, wire it up and you're good to go!

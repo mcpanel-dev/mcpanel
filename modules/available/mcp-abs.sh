@@ -40,8 +40,8 @@ function mcpanel::abs::main
 {
   local command=$1
 
-  case ${command} in
-    demo) mcpanel::abs::demo;;
-    help|*) mcpanel::abs::info;;
+  case "${command}" in
+    help) mcpanel::abs::info;;
+    *) mcpanel::abs::demo;;
   esac
 }

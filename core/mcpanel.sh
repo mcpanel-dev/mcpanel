@@ -12,7 +12,7 @@ function mcpanel::banner()
 function mcpanel::module::enable()
 {
   local command=$1
-  if [[ -z ${command} ]]; then
+  if [[ -z "${command}" ]]; then
     abs::error "You must provide a module to enable!"
     return 1
   fi
@@ -41,7 +41,7 @@ function mcpanel::module::enable()
 function mcpanel::module::disable()
 {
   local command=$1
-  if [[ -z ${1} ]]; then
+  if [[ -z "${command}" ]]; then
     abs::error "You must provide a module to disable!"
     return 1
   fi
@@ -57,19 +57,27 @@ function mcpanel::module::disable()
   return 0
 }
 
-function mcpanel::module::list()
+function mcpanel::toolbox::getModuleList()
 {
   local mode=${1:-'available'}
   local modules=$(ls ${MCPANEL_DIRECTORY}/modules/${mode}/mcp-*.sh 2>/dev/null)
+
+  return ${modules}
+}
+
+function mcpanel::module::list()
+{
+  local mode=${1:-'available'}
+  modules=mcpanel::toolbox::getModuleList "${mode}"
 
   abs::writeln "MCPanel modules for ${STYLE_COMMENT}${mode}${STYLE_DEFAULT}:"
   if [[ -z ${modules} ]]; then
     abs::error "\tCurrently, there's no any modules in ${STYLE_COMMENT}${mode}"
   else
     for module in ${modules}; do
-      local module_full=$(basename ${module} .sh)
-      local module_name=$(echo ${module_full} | cut -d'-' -f2)
-      abs::writeln "\t- mcp-${STYLE_COMMENT}${module_name}"
+      local moduleName=$(echo $(basename "${module}" .sh) | cut -d'-' -f2)
+
+      abs::writeln "\t- mcp-${STYLE_COMMENT}${moduleName}"
     done
 
     abs::writeln "\nThe module's name is listed with ${STYLE_COMMENT}this color"
@@ -78,16 +86,16 @@ function mcpanel::module::list()
 
 function mcpanel::info()
 {
-  local version_color="${STYLE_SUCCESS}"
+  local versionColor="${STYLE_SUCCESS}"
   local modules=()
 
   abs::notice "Minecraft Server Control Panel"
   abs::notice "\tfor Linux"
 
   case ${MCPANEL_VERSION_CHANNEL} in
-    dev) version_color="${STYLE_ERROR}";;
-    release) version_color="${STYLE_SUCCESS}";;
-    testing) version_color="${STYLE_COMMENT}";;
+    dev) versionColor="${STYLE_ERROR}";;
+    release) versionColor="${STYLE_SUCCESS}";;
+    testing) versionColor="${STYLE_COMMENT}";;
   esac
 
   abs::writeln "Version ${version_color}${MCPANEL_VERSION}"
@@ -99,14 +107,16 @@ function mcpanel::info()
   abs::info "list-modules" "Displays a list of all available modules."
   abs::writeln
 
-  if [[ -z ${MCPANEL_MODULES} ]]; then
+  local modules=mcpanel::toolbox::getModuleList
+
+  if [[ -z "${modules}" ]]; then
     abs::comment "Currently there's no module enabled! Please execute ${STYLE_SUCCESS}mcpanel enable-module [module-name]"
   else
-    for module in ${MCPANEL_MODULES[@]}; do
-      local module_name=$(echo ${module} | cut -d'-' -f2)
-      modules+=(${module_name%.*})
+    for module in ${modules[@]}; do
+      local moduleName=$(echo "${module}" | cut -d'-' -f2)
+      modules+=(${moduleName%.*})
     done
-    abs::writeln "List of enabled modules: ${STYLE_COMMENT}[$(mcpanel::toolbox::join_by '|' "${modules[@]}")]"
+    abs::writeln "List of enabled modules: ${STYLE_COMMENT}[$(mcpanel::toolbox::joinBy '|' "${modules[@]}")]"
   fi
 
   abs::writeln
@@ -116,23 +126,23 @@ function mcpanel::info()
   abs::developer "hktr92"
 }
 
-function mcpanel::synchronize_ip_address()
+function mcpanel::toolbox::synchronizeIpAddress()
 {
   local visibility=${1:-${SERVER_DEFAULT_VISIBILITY}}
   local gateway=${2:-${IFCONFIG_GATEWAY}}
-  local hostname_param="I"
-  local server_ip=
-  local host_ip=
+  local hostnameParam="I"
+  local serverAddr=
+  local hostAddr=
 
   case ${visibility} in
     local)
-      hostname_param="i"
+      hostnameParam="i"
       ;;
     lan)
-      hostname_param="I"
+      hostnameParam="I"
       ;;
     public)
-      hostname_param=
+      hostnameParam=
       ;;
     *)
       abs::error "Invalid server visibility: ${visibility}"
@@ -140,27 +150,27 @@ function mcpanel::synchronize_ip_address()
       ;;
   esac
 
-  if [[ -z ${hostname_param} ]]; then
-    host_ip=$(dig +short myip.opendns.com @resolver1.opendns.com)
+  if [[ -z ${hostnameParam} ]]; then
+    hostAddr=$(dig +short myip.opendns.com @resolver1.opendns.com)
   else
-    host_ip=$(hostname -${hostname_param} | cut -d' ' -f1)
+    hostAddr=$(hostname -${hostnameParam} | cut -d' ' -f1)
   fi
 
   if [[ ! -e "${serverDirectory}/server.properties" ]]; then
     abs::error "Server configuration file was not found!"
     abs::writeln "Writing server IP manually..."
-    echo "server-ip=${host_ip}" > "${serverDirectory}/server.properties"
+    echo "server-ip=${hostAddr}" > "${serverDirectory}/server.properties"
   fi
 
-  server_ip=$(cat "${serverDirectory}/server.properties" | grep "server-ip" | cut -d'=' -f2)
+  serverAddr=$(cat "${serverDirectory}/server.properties" | grep "server-ip" | cut -d'=' -f2)
 
   abs::writeln "Server visibility level: ${STYLE_COMMENT}${visibility}"
-  abs::writeln "Server's IP from configuration: ${STYLE_COMMENT}${server_ip}"
-  abs::writeln "Server's hostname: ${STYLE_COMMENT}${host_ip}"
+  abs::writeln "Server's IP from configuration: ${STYLE_COMMENT}${serverAddr}"
+  abs::writeln "Server's hostname: ${STYLE_COMMENT}${hostAddr}"
 
-  if [[ "${gateway} == "${IFCONFIG_GATEWAY} ]] && [[ "${server_ip}" != "${host_ip}" ]]; then
+  if [[ "${gateway} == "${IFCONFIG_GATEWAY} ]] && [[ "${serverAddr}" != "${hostAddr}" ]]; then
     abs::notice "Found new gateway IP address, which is going to be replaced..."
-    sed --expression "s/${server_ip}/${host_ip}/g" --in-place "${serverDirectory}/server.properties"
+    sed --expression "s/${serverAddr}/${hostAddr}/g" --in-place "${serverDirectory}/server.properties"
     if [[ $? -ne 0 ]]; then
       abs::error "Unable to replace server's IP address"
       return $?
@@ -173,11 +183,64 @@ function mcpanel::synchronize_ip_address()
   fi
 }
 
-function mcpanel::toolbox::join_by()
+function mcpanel::toolbox::joinBy()
 {
   local d=$1
   shift
   echo -n "$1"
   shift
   printf "%s" "${@/#/$d}"
+}
+
+function mcpanel::toolbox::download()
+{
+    local url=$1
+    local outputDocument=${2:-${PWD}}
+    local downloadTools=( ["wget"]="wget --show-progress --timestamping --output-document=${outputDocument}"
+                          ["curl"]="curl --progress-bar --output ${outputDocument}" )
+
+    for tool in ${!downloadTools[@]}; do
+        which "${tool}" > /dev/null
+        if [[ $? -ne 0 ]]; then
+            ${downloadTools["${tool}"]} "${url}"
+            return $?
+        fi
+    done
+
+    abs::error "no download tool detected on this system; please install one of following:"
+    for tool in ${!downloadTools[@]}; do
+        abs::writeln "\t- ${STYLE_COMMENT}${tool}"
+    done
+}
+
+function mcpanel::toolbox::fetch()
+{
+    local url=$1
+
+    which "curl" > /dev/null
+    if [[ $? -eq 0 ]]; then
+        abs::error "no download tool detected on this system; please install one of following:"
+        abs::writeln "\t- ${STYLE_COMMENT}curl"
+
+        return 1
+    fi
+
+    curl --silent "${url}"
+
+    return $?
+}
+
+function mcpanel::toolbox::parseOptions()
+{
+    local params=$@
+    local _result=()
+
+    for param in ${params[@]}; do
+        local _pName=$(echo ${param} | cut -d= -f1)
+        local _pValue=$(echo ${param} | cut -d= -f2)
+
+        _result["${_pName}"]="${_pValue}"
+    done
+
+    return $_result
 }
